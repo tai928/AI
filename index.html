@@ -167,3 +167,24 @@ ${MBTI_POLICIES[state.mbti]}
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          system: systemPrompt(),
+          messages: state.history
+        })
+      });
+
+      const data = await res.json();
+      loading.textContent = data.reply;
+      state.history.push({ role: "assistant", content: data.reply });
+
+    } catch (e) {
+      loading.textContent = "エラー：" + e.message;
+    }
+  }
+
+  sendBtn.onclick = send;
+  msg.onkeydown = e => e.key === "Enter" && send();
+
+  add("MBTIを選んで話しかけてみて。", "bot");
+</script>
+</body>
+</html>
