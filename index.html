@@ -151,35 +151,38 @@ ${MBTI_POLICIES[state.mbti]}
 `.trim();
   }
 
-  async function send() {
-    const text = msg.value.trim();
-    if (!text) return;
-    msg.value = "";
+ async function send() {
+  const text = msg.value.trim();
+  if (!text) return;
 
-    add(text, "me");
-    state.history.push({ role: "user", content: text });
+  // 先に確実に消す（送信失敗しても残らない）
+  msg.value = "";
+  msg.focus();
 
-    add("…考え中", "bot");
-    const loading = chat.lastChild;
+  add(text, "me");
+  state.history.push({ role: "user", content: text });
 
-    try {
-      const res = await fetch("https://ai.taisei-study928.workers.dev/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system: systemPrompt(),
-          messages: state.history
-        })
-      });
+  add("…考え中", "bot");
+  const loading = chat.lastChild;
 
-      const data = await res.json();
-      loading.textContent = data.reply;
-      state.history.push({ role: "assistant", content: data.reply });
+  try {
+    const res = await fetch("https://ai.taisei-study928.workers.dev/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system: systemPrompt(),
+        messages: state.history
+      })
+    });
 
-    } catch (e) {
-      loading.textContent = "エラー：" + e.message;
-    }
+    const data = await res.json();
+    loading.textContent = data.reply;
+    state.history.push({ role: "assistant", content: data.reply });
+
+  } catch (e) {
+    loading.textContent = "エラー：" + e.message;
   }
+}
 
   sendBtn.onclick = send;
   msg.onkeydown = e => e.key === "Enter" && send();
