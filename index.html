@@ -60,6 +60,16 @@
       cursor: pointer;
     }
     small { opacity: .6; }
+    textarea {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      font-size: 15px;
+      resize: vertical;
+      min-height: 44px;
+      max-height: 160px;
+}
   </style>
 </head>
 <body>
@@ -75,12 +85,12 @@
   </select>
 </div>
 
-<small>※ 無料 / APIキーはブラウザに存在しません</small>
+
 
 <div id="chat"></div>
 
 <div class="row">
-  <input id="msg" placeholder="メッセージを入力…" />
+  <textarea id="msg" placeholder="メッセージを入力…"></textarea>
   <button id="send">送信</button>
 </div>
 
@@ -185,7 +195,7 @@ ${MBTI_POLICIES[state.mbti]}
 }
 
   sendBtn.onclick = send;
-  msg.onkeydown = e => e.key === "Enter" && send();
+
 
   add("MBTIを選んで話しかけてみて。", "bot");
 </script>
