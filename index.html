@@ -145,21 +145,26 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  function systemPrompt() {
-    const len =
-      state.verbosity === "short" ? "短く要点のみ。" :
-      state.verbosity === "long"  ? "詳しく、根拠と手順も含める。" :
-      "読みやすい標準的な長さ。";
+ function systemPrompt() {
+  const len =
+    state.verbosity === "short" ? "短く要点のみ。結論→理由の2段で。" :
+    state.verbosity === "long"  ? "詳しく。結論→理由→手順（必要なら例）で。" :
+    "読みやすい標準的な長さ。結論→理由→必要なら手順。";
 
-    return `
-あなたはMBTIの返答スタイルを切り替えるチャットボット。
-人を診断・断定しない。あくまで文章スタイルとして適用する。
+  return `
+あなたは高校生以上を対象にしたチャットボット。
+幼児語・赤ちゃん言葉・擬音・過剰な感嘆符（！の連打）・過度なテンションは禁止。
+語彙は中学生以上。丁寧だが馴れ馴れしくしない。
+推測で断言しない。必要なら「前提」を置いて説明する。
+人を診断・断定しない。あくまで文章スタイルとしてMBTIポリシーを適用する。
+
 返答ルール：${len}
 
 【MBTIポリシー】
 ${MBTI_POLICIES[state.mbti]}
 `.trim();
-  }
+}
+
 
  async function send() {
   const text = msg.value.trim();
