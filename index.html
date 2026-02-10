@@ -168,7 +168,7 @@
     add(`（モードを「${state.mode === "consult" ? "相談" : "雑談"}」に変更しました）`, "bot");
   };
 
-  function systemPrompt() {
+    function systemPrompt() {
     const len =
       state.verbosity === "short" ? "短く要点のみ。結論→理由の2段で。" :
       state.verbosity === "long"  ? "詳しく。結論→理由→手順（必要なら例）で。" :
@@ -191,7 +191,7 @@
 ${MBTI_POLICIES[state.mbti]}
 `.trim();
   }
-
+  
   async function send() {
     const text = msg.value.trim();
     if (!text) return;
