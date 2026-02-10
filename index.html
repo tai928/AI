@@ -83,6 +83,10 @@
     <option value="normal" selected>普通</option>
     <option value="long">詳しめ</option>
   </select>
+    <select id="mode">
+    <option value="consult" selected>相談</option>
+    <option value="chat">雑談</option>
+  </select>
 </div>
 
 
@@ -102,6 +106,24 @@
   const sendBtn = document.getElementById("send");
   const mbtiSel = document.getElementById("mbti");
   const verbSel = document.getElementById("verbosity");
+  const modeSel = document.getElementById("mode");
+
+const state = {
+  mbti: saved.mbti || "INTJ",
+  verbosity: saved.verbosity || "normal",
+  mode: saved.mode || "consult",
+  history: []
+};
+
+modeSel.value = state.mode;
+
+modeSel.onchange = () => {
+  state.mode = modeSel.value;
+  state.history = []; // モード変えたら会話の癖をリセット（超重要）
+  save();
+  add(`（モードを「${state.mode === "consult" ? "相談" : "雑談"}」に変更しました）`, "bot");
+};
+
 
   const saved = JSON.parse(localStorage.getItem("mbtiSettings") || "{}");
 
@@ -133,9 +155,11 @@
   function save() {
     localStorage.setItem("mbtiSettings", JSON.stringify({
       mbti: state.mbti,
-      verbosity: state.verbosity
+      verbosity: state.verbosity,
+      mode: state.mode
     }));
   }
+
 
   function add(text, cls) {
     const d = document.createElement("div");
@@ -145,22 +169,26 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
- function systemPrompt() {
+function systemPrompt() {
   const len =
     state.verbosity === "short" ? "短く要点のみ。結論→理由の2段で。" :
     state.verbosity === "long"  ? "詳しく。結論→理由→手順（必要なら例）で。" :
     "読みやすい標準的な長さ。結論→理由→必要なら手順。";
 
+  const modeRule =
+    state.mode === "consult"
+      ? "相談モード：状況整理→確認質問（最大3つ）→提案（最大3つ）。相手を診断・断定しない。"
+      : "雑談モード：テンポ良く会話する。ただし幼児語・過剰な感嘆符は禁止。必要なら質問で広げる。";
+
   return `
-あなたは高校生以上を対象にしたチャットボット。
-幼児語・赤ちゃん言葉・擬音・過剰な感嘆符（！の連打）・過度なテンションは禁止。
-語彙は高校生以上。丁寧だが馴れ馴れしくしない。
-推測で断言しない。必要なら「前提」を置いて説明する。また、質問に対しては情報源を明確に。
-人を診断・断定しない。あくまで文章スタイルとしてMBTIポリシーを適用する。
+あなたはStepLink内のチャットボット。
+高校生以上向けの文体。幼児語・擬音・過剰な感嘆符は禁止。
+人を診断・断定しない。安全に配慮する。
 
 返答ルール：${len}
+モード：${modeRule}
 
-【MBTIポリシー】
+【MBTIポリシー（必ず遵守）】
 ${MBTI_POLICIES[state.mbti]}
 `.trim();
 }
@@ -203,6 +231,14 @@ ${MBTI_POLICIES[state.mbti]}
 
 
   add("MBTIを選んで話しかけてみて。", "bot");
+
+  mbtiSel.onchange = () => {
+  state.mbti = mbtiSel.value;
+  state.history = []; // ←追加（重要）
+  save();
+  add(`（MBTIスタイルを「${state.mbti}」に変更しました）`, "bot");
+};
+
 </script>
 </body>
 </html>
